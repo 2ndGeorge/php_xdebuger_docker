@@ -1,5 +1,9 @@
 FROM php:5.5-apache
 
+ENV XDEBUG_IDEKEY="docker" \
+    XDEBUG_PORT=9001 \
+    XDEBUG_HOST=host.docker.internal
+
 # Install dependencies we need
 
 RUN apt-get update && apt-get install -y \
@@ -64,8 +68,8 @@ RUN docker-php-ext-install \
 
 RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
     echo "xdebug.remote_autostart=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
-    echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/xdebug.ini && \
-    echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/xdebug.ini&& \
-    echo "xdebug.remote_host=host.docker.internal" >> /usr/local/etc/php/conf.d/xdebug.ini
+    echo "xdebug.remote_port=${XDEBUG_PORT}" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+    echo "xdebug.idekey=${XDEBUG_IDEKEY}" >> /usr/local/etc/php/conf.d/xdebug.ini&& \
+    echo "xdebug.remote_host=${XDEBUG_HOST}" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 EXPOSE 80 

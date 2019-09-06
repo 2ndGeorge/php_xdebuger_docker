@@ -1,14 +1,8 @@
 FROM php:7.2-apache
-MAINTAINER Clint Armstrong <clint@clintarmstrong.net>
 
 ENV XDEBUG_IDEKEY="docker" \
     XDEBUG_PORT=9001 \
-    XDEBUG_HOST=host.docker.internal \
-    MYSQL_HOST="mysql" \
-    MYSQL_USER="phpipam" \
-    MYSQL_PASSWORD="phpipamadmin" \
-    MYSQL_DB="phpipam" \
-    MYSQL_PORT="3306"
+    XDEBUG_HOST=host.docker.internal
 
 RUN apt-get update && \ 
     apt-get install -y git libgmp-dev libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libldb-dev libldap2-dev && \
