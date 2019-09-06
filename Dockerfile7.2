@@ -1,0 +1,37 @@
+FROM php:7.2-apache
+MAINTAINER Clint Armstrong <clint@clintarmstrong.net>
+
+ENV XDEBUG_IDEKEY="docker" \
+    XDEBUG_PORT=9001 \
+    XDEBUG_HOST=host.docker.internal \
+    MYSQL_HOST="mysql" \
+    MYSQL_USER="phpipam" \
+    MYSQL_PASSWORD="phpipamadmin" \
+    MYSQL_DB="phpipam" \
+    MYSQL_PORT="3306"
+
+RUN apt-get update && \ 
+    apt-get install -y git libgmp-dev libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libldb-dev libldap2-dev && \
+    ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so && \
+    ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so && \
+    docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
+    ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h && \
+    docker-php-ext-configure gmp --with-gmp=/usr/include/x86_64-linux-gnu && \
+    docker-php-ext-configure gd && \
+    docker-php-ext-install -j$(nproc) pdo_mysql sockets gd gmp ldap gettext pcntl && \
+    echo ". /etc/environment" >> /etc/apache2/envvars && \
+    a2enmod rewrite
+
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+RUN pecl install -o -f redis \
+    && docker-php-ext-enable redis
+
+RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+    echo "xdebug.remote_autostart=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+    echo "xdebug.remote_port=${XDEBUG_PORT}" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+    echo "xdebug.idekey=${XDEBUG_IDEKEY}" >> /usr/local/etc/php/conf.d/xdebug.ini&& \
+    echo "xdebug.remote_host=${XDEBUG_HOST}" >> /usr/local/etc/php/conf.d/xdebug.ini
+
+EXPOSE 80

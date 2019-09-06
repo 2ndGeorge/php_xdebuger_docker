@@ -1,0 +1,71 @@
+FROM php:5.5-apache
+
+# Install dependencies we need
+
+RUN apt-get update && apt-get install -y \
+    bzip2 \
+    exiftool \
+    git-core \
+    imagemagick \
+    libbz2-dev \
+    libc-client2007e-dev \
+    libjpeg-dev \
+    libkrb5-dev \
+    libldap2-dev \
+    libmagickwand-dev \
+    libmcrypt-dev \
+    libmemcached-dev \
+    libpng12-dev \
+    libpq-dev \
+    libxml2-dev \
+    libicu-dev \
+    mysql-client \
+    postgresql-client \
+    pv \
+    ssh \
+    unzip \
+    wget \
+    xfonts-base \
+    xfonts-75dpi \
+    zlib1g-dev
+RUN pecl install apcu-4.0.11 \
+  && pecl install imagick
+RUN pecl install oauth-1.2.3
+RUN pecl install redis-2.2.8
+RUN pecl install xdebug-2.5.5
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr 
+RUN docker-php-ext-configure imap --with-imap-ssl --with-kerberos
+RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu
+RUN docker-php-ext-enable apcu 
+RUN docker-php-ext-enable imagick
+RUN docker-php-ext-enable xdebug
+RUN docker-php-ext-enable oauth 
+RUN docker-php-ext-enable redis
+RUN docker-php-ext-install \
+    bcmath \
+    bz2 \
+    calendar \
+    exif \
+    gd \
+    imap \
+    ldap \
+    mcrypt \
+    mbstring \
+    mysql \
+    mysqli \
+    opcache \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    soap \
+    zip \
+    intl \
+    gettext
+
+RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+    echo "xdebug.remote_autostart=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+    echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+    echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/xdebug.ini&& \
+    echo "xdebug.remote_host=host.docker.internal" >> /usr/local/etc/php/conf.d/xdebug.ini
+
+EXPOSE 80 
